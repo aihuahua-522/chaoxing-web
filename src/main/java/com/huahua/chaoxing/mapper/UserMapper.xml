@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huahua.chaoxing.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="UserBean">
+        <id column="u_tel" jdbcType="INTEGER" property="tel"/>
+        <result column="u_pass" jdbcType="VARCHAR" property="pass"/>
+        <result column="u_signPlace" jdbcType="VARCHAR" property="signPlace"/>
+        <result column="u_email" jdbcType="VARCHAR" property="email"/>
+        <result column="u_cookies" jdbcType="VARCHAR" property="cookies"/>
+        <collection property="picBeans" ofType="PicBean">
+            <id column="p_id" property="pid"/>
+            <result column="p_objectId" property="objectid"/>
+            <result column="p_tel" property="tel"/>
+        </collection>
+        <collection property="courseBeans" ofType="CourseBean">
+            <id column="c_id" property="cid"/>
+            <result column="c_tel" property="tel"/>
+            <result column="c_classId" property="classId"/>
+            <result column="c_courseId" property="courseId"/>
+            <result column="c_className" property="className"/>
+            <result column="c_courseName" property="courseName"/>
+            <result column="c_signUrl" property="signUrl"/>
+            <result column="c_workUrl" property="workUrl"/>
+            <result column="c_teacher" property="teacher"/>
+        </collection>
+
+    </resultMap>
+    <sql id="all">
+        u.tel  as   u_tel,
+        u.pass as   u_pass,
+        u.signPlace as u_signPlace,
+        u.email as u_email,
+        u.cookies as u_cookies,
+        p.objectId as p_objectId,
+        p.tel as p_tel,
+        p.pid as p_id,
+        c.cid as c_id,
+        c.tel as c_tel,
+        c.courseName as  c_courseName,
+        c.className as c_className,
+        c.classId as c_classId,
+        c.courseId as c_courseId,
+        c.signUrl as c_signUrl,
+        c.workUrl as c_workUrl,
+        c.teacher as c_teacher
+    </sql>
+    <insert id="insert" parameterType="userBean">
+            insert into userinfo values(#{userBean.tel},#{userBean.pass},#{userBean.signPlace},#{userBean.email},#{userBean.cookies});
+    </insert>
+
+    <select id="checkUser" resultType="int">
+        select
+        count(*)
+        from
+        userInfo u
+        where
+        u.tel = #{tel} and u.pass = #{pass}
+
+    </select>
+
+    <delete id="delete">
+        delete  from userInfo u where u.tel = #{tel} and u.pass  = #{pass}
+    </delete>
+
+
+    <select id="selectByTel" resultMap="BaseResultMap">
+        select
+        <include refid="all"/>
+        from userInfo u,
+        pic p ,
+        course c
+        where u.tel = p.tel and u.tel = c.tel and u.tel = #{tel} and u.pass = #{pass} ;
+    </select>
+
+
+    <select id="getAll" resultMap="BaseResultMap" resultType="UserBean">
+        select
+        <include refid="all"/>
+        from userInfo u ,pic p,course c where u.tel = p.tel and u.tel = c.tel;
+    </select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

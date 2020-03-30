@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huahua.chaoxing.mapper.CourseMapper">
+
+    <insert id="insertCourse" parameterType="courseBean">
+        insert into course values (default ,#{tel},#{course.classId},#{course.courseId},#{course.teacher},#{course.courseName},#{course.className},#{course.signUrl},#{course.workUrl});
+    </insert>
+
+    <delete id="deleteAllCourse">
+        delete from course where tel = #{tel};
+    </delete>
+    <select id="getAllCourse" resultType="com.huahua.chaoxing.bean.CourseBean">
+        select * from course where tel = #{tel};
+    </select>
+
+</mapper>

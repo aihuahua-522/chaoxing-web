@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huahua.chaoxing.mapper.PicMapper">
+    <resultMap id="BaseResultMap" type="com.huahua.chaoxing.bean.PicBean">
+        <id column="pid" jdbcType="INTEGER" property="pid"/>
+        <result column="objectId" jdbcType="VARCHAR" property="objectid"/>
+        <result column="uid" jdbcType="INTEGER" property="tel"/>
+    </resultMap>
+    <insert id="insert">
+            insert into pic values (default,#{objectId},#{tel});
+    </insert>
+    <delete id="deleteAllPic">
+        delete from pic where tel = #{tel}
+    </delete>
+
+
+</mapper>
