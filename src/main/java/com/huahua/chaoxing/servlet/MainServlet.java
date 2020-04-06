@@ -5,6 +5,7 @@ import com.huahua.chaoxing.bean.PicBean;
 import com.huahua.chaoxing.bean.UserBean;
 import com.huahua.chaoxing.service.i.UserService;
 import com.huahua.chaoxing.service.impl.UserServiceImpl;
+import com.huahua.chaoxing.util.DateUtil;
 import com.huahua.chaoxing.util.EmailUtil;
 import com.huahua.chaoxing.util.JsonUtil;
 import org.jsoup.Connection;
@@ -21,10 +22,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URLEncoder;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,12 +52,15 @@ public class MainServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int s = Integer.parseInt(LocalDateTime.now(ZoneId.of("Asia/Shanghai")).format(DateTimeFormatter.ofPattern("HH")));
+        if (s > 20 || s < 7) {
+            response.getWriter().print("未到扫描时间");
+            return;
+        }
         UserService userService = new UserServiceImpl();
         ArrayList<UserBean> all = userService.getAll();
-        response.getWriter().println(JsonUtil.objectToJson(all));
-        all.forEach((u) -> {
-            executorService.execute(new signRunning(u));
-        });
+        response.getWriter().println("账号总数" + all.size() + "\n" + DateUtil.getTime());
+        all.forEach((u) -> executorService.execute(new signRunning(u)));
     }
 
 
@@ -113,7 +123,7 @@ public class MainServlet extends HttpServlet {
                         "结束时间 -> " + "\t" + endTime + "\n" +
                         "提交状态 -> " + "\t" + workState;
                 try {
-                    executorService.submit(new EmailUtil.emailSendRunning(email, message));
+                    executorService.execute(new EmailUtil.emailSendRunning(email, message));
                     userMap.put(String.valueOf(userBean.getTel()), activeId);
                 } catch (Exception e) {
                     userMap.remove(activeId);
@@ -131,7 +141,10 @@ public class MainServlet extends HttpServlet {
                 Matcher matcher = pattern.matcher(s);
                 String activeId = matcher.find() ? matcher.group() : "";
                 String signTime = element.selectFirst(".Color_Orang").text();
-                String signText = element.selectFirst("a[shape]").text();
+                if (signTime == null || signTime.isEmpty()) {
+                    signTime = "超星问题,显示不出剩余时间";
+                }
+                String signText = element.selectFirst(".Mct_center a[shape]").text();
                 if (userMap.get(activeId) != null) {
                     continue;
                 }
@@ -152,7 +165,12 @@ public class MainServlet extends HttpServlet {
                         score(email, courseBean, signText, signTime, activeId);
                         break;
                     default:
-                        executorService.submit(new EmailUtil.emailSendRunning(email, courseBean.getCourseName() + "有未知活动" + "活动名称" + state + "\n" + signText));
+                        String message = "课程名称 -> " + "\t" + courseBean.getCourseName() + "\n" +
+                                "班级名称 -> " + "\t" + courseBean.getClassName() + "\n" +
+                                "活动标题 -> " + "\t" + signText + "\n" +
+                                "剩余时间 -> " + signTime;
+                        userMap.put(activeId, activeId);
+                        executorService.execute(new EmailUtil.emailSendRunning(email, message));
                         break;
                 }
             }
@@ -161,12 +179,12 @@ public class MainServlet extends HttpServlet {
         private void score(String email, CourseBean courseBean, String signText, String signTime, String activeId) {
 
             // TODO 发送邮件 有评分
-            String message = "课程名称 -> " + "\t" + courseBean.getCourseName() +
+            String message = "课程名称 -> " + "\t" + courseBean.getCourseName() + "\n" +
                     "班级名称 -> " + "\t" + courseBean.getClassName() + "\n" +
-                    "评分标题" + "\t" + signText + "\n" +
-                    "剩余时间" + signTime;
+                    "评分标题 -> " + "\t" + signText + "\n" +
+                    "剩余时间 -> " + signTime;
             try {
-                executorService.submit(new EmailUtil.emailSendRunning(email, message));
+                executorService.execute(new EmailUtil.emailSendRunning(email, message));
                 userMap.put(activeId, activeId);
             } catch (Exception e) {
                 userMap.remove(activeId);
@@ -180,10 +198,10 @@ public class MainServlet extends HttpServlet {
             // TODO  发送邮件 有测验
             String message = "课程名称 -> " + "\t" + courseBean.getCourseName() + "\n" +
                     "班级名称 -> " + "\t" + courseBean.getClassName() + "\n" +
-                    "测验标题" + "\t" + signText + "\n" +
-                    "剩余时间" + "\t" + signTime;
+                    "测验标题 -> " + "\t" + signText + "\n" +
+                    "剩余时间 -> " + "\t" + signTime;
             try {
-                executorService.submit(new EmailUtil.emailSendRunning(email, message));
+                executorService.execute(new EmailUtil.emailSendRunning(email, message));
                 userMap.put(activeId, activeId);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -198,7 +216,7 @@ public class MainServlet extends HttpServlet {
                     "抢答标题 -> " + signText + "\n" +
                     "剩余时间 -> " + signTime;
             try {
-                executorService.submit(new EmailUtil.emailSendRunning(email, message));
+                executorService.execute(new EmailUtil.emailSendRunning(email, message));
                 userMap.put(activeId, activeId);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -213,7 +231,7 @@ public class MainServlet extends HttpServlet {
                     "问卷标题 -> " + signText + "\n" +
                     "剩余时间 -> " + signTime;
             try {
-                executorService.submit(new EmailUtil.emailSendRunning(email, message));
+                executorService.execute(new EmailUtil.emailSendRunning(email, message));
                 userMap.put(activeId, activeId);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -241,13 +259,15 @@ public class MainServlet extends HttpServlet {
                 if ("您已签到过了".equals(signState)) {
                     userMap.put(activeId, activeId);
                 }
-                String message = "班级名称-> " + courseBean.getCourseName() + "\n" +
+                String message = "========这是签到=========" + "\n" + "班级名称-> " + courseBean.getCourseName() + "\n" +
                         "课程名称 -> " + courseBean.getClassName() + "\n" +
                         "签到类型 -> " + signText + "\n" +
                         "签到状态 -> " + signState + "\n" +
-                        "剩余时间 -> " + signTime;
-                executorService.submit(new EmailUtil.emailSendRunning(email, message));
+                        "剩余时间 -> " + signTime + "\n" +
+                        "=========签到结束========";
+                executorService.execute(new EmailUtil.emailSendRunning(email, message));
             } catch (Exception e) {
+                executorService.execute(new EmailUtil.emailSendRunning(email, courseBean.getCourseName() + "可能签到失败(服务器会自动重试),建议手动看看"));
                 e.printStackTrace();
                 userMap.remove(activeId);
             }

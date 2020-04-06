@@ -4,13 +4,11 @@ import com.huahua.chaoxing.bean.ResultBean;
 import com.huahua.chaoxing.bean.UserBean;
 import com.huahua.chaoxing.mapper.UserMapper;
 import com.huahua.chaoxing.service.i.UserService;
+import com.huahua.chaoxing.util.EmailUtil;
 import com.huahua.chaoxing.util.JsonUtil;
 import com.huahua.chaoxing.util.MybatisUtil;
-import com.sun.org.apache.regexp.internal.RE;
-import org.apache.ibatis.jdbc.SQL;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
-import sun.rmi.runtime.Log;
 
 import javax.servlet.http.Cookie;
 import java.math.BigInteger;
@@ -54,6 +52,7 @@ public class UserServiceImpl implements UserService {
                 resultBean.setCode(200);
                 resultBean.setMsg("添加成功");
                 resultBean.setData("");
+                EmailUtil.sendMail(userBean.getEmail(), "用户 ->>>>>" + userBean.getTel() + "\n 恭喜你提交成功 \n 记得一定要同步课程和图片 \n 不然服务器不会签到哦 \n 如果有时间记得去看看 \n 我只能尽量保证服务器的运行");
             } else {
                 resultBean.setCode(201);
                 resultBean.setMsg("已存在");
@@ -64,7 +63,7 @@ public class UserServiceImpl implements UserService {
             logger.error(e);
             sqlSession.rollback();
             resultBean.setCode(202);
-            resultBean.setMsg("添加失败");
+            resultBean.setMsg("添加失败,请尝试更换邮箱或者手机号");
             resultBean.setData("");
         }
         sqlSession.commit();
