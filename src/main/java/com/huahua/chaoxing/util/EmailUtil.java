@@ -108,7 +108,7 @@ public class EmailUtil {
         qqBean.setMessage(DateUtil.getTime() + "\n" + context);
         try {
             HttpUtil.trustEveryone();
-            Document post = Jsoup.connect("http://39.96.95.173:5700/send_private_msg")
+            Document post = Jsoup.connect("http://39.108.127.153:5700/send_private_msg")
                     .requestBody(JsonUtil.objectToJson(qqBean))
                     .header("Content-Type", "application/json")
                     .ignoreContentType(true)

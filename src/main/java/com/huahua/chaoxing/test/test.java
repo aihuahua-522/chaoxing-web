@@ -1,25 +1,25 @@
 package com.huahua.chaoxing.test;
 
-import com.huahua.chaoxing.bean.*;
+import com.huahua.chaoxing.bean.CourseBean;
+import com.huahua.chaoxing.bean.PicBean;
+import com.huahua.chaoxing.bean.ResultBean;
+import com.huahua.chaoxing.bean.UserBean;
 import com.huahua.chaoxing.service.i.CourseService;
 import com.huahua.chaoxing.service.i.PicService;
 import com.huahua.chaoxing.service.i.UserService;
 import com.huahua.chaoxing.service.impl.CourseServiceImpl;
 import com.huahua.chaoxing.service.impl.PicServiceImpl;
 import com.huahua.chaoxing.service.impl.UserServiceImpl;
-import com.huahua.chaoxing.util.DateUtil;
-import com.huahua.chaoxing.util.HttpUtil;
 import com.huahua.chaoxing.util.JsonUtil;
-import javafx.geometry.Pos;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
 
 import javax.servlet.http.Cookie;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class test {
     BigInteger tel = new BigInteger("17702020202231231");
@@ -106,12 +106,17 @@ public class test {
     @Test
     public void test() throws IOException {
 
-        String message = "课程名称 -> " + "\t" +" courseBean.getCourseName()" + "\n" +
-                "班级名称 -> " + "\t" +" courseBean.getClassName()" + "\n" +
+        String message = "课程名称 -> " + "\t" + " courseBean.getCourseName()" + "\n" +
+                "班级名称 -> " + "\t" + " courseBean.getClassName()" + "\n" +
                 "活动标题 -> " + "\t" + "signText" + "\n" +
                 "剩余时间 -> " + "signTime";
 
 
+//        1586262003730
+
+        Instant now = Instant.ofEpochMilli(Long.parseLong("1586262003730"));
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(now, ZoneId.systemDefault());
+        System.out.println(localDateTime);
     }
 
 
