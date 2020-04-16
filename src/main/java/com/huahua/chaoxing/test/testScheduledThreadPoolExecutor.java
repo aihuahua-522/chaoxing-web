@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 
 public class testScheduledThreadPoolExecutor {
 
-    ExecutorService executorService = new ThreadPoolExecutor(100,
+    ExecutorService executorService = new ThreadPoolExecutor(500,
             Integer.MAX_VALUE,
             1, TimeUnit.MINUTES,
             new LinkedBlockingQueue<>(10),

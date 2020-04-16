@@ -32,7 +32,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.45</version>
+            <version>8.0.19</version>
         </dependency>
 
 
@@ -49,6 +49,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>1.1.22</version>
+        </dependency>
 
         <dependency>
             <groupId>org.jsoup</groupId>
@@ -88,6 +93,7 @@
             <artifactId>javax.mail</artifactId>
             <version>1.5.4</version>
         </dependency>
+
 
     </dependencies>
 
@@ -140,12 +146,6 @@
                 </includes>
             </resource>
 
-            <resource>
-                <directory>cookies</directory>
-                <excludes>
-                    <exclude>*/*</exclude>
-                </excludes>
-            </resource>
 
 
         </resources>

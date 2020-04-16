@@ -1,9 +1,8 @@
 package com.huahua.chaoxing.service.i;
 
-import java.util.HashMap;
-
 import com.huahua.chaoxing.bean.ResultBean;
 import com.huahua.chaoxing.bean.UserBean;
+import org.apache.ibatis.annotations.Param;
 
 import javax.servlet.http.Cookie;
 import java.math.BigInteger;
@@ -26,11 +25,12 @@ public interface UserService {
 
     /**
      * 删除一个用户
-     * @param tel 手机号
+     *
+     * @param tel  手机号
      * @param pass
      * @return
      */
-    ResultBean<String> deleteUser(BigInteger tel,String pass);
+    ResultBean<String> deleteUser(BigInteger tel, String pass);
 
     /**
      * 返回所有用户信息
@@ -54,5 +54,13 @@ public interface UserService {
      * @return
      */
     UserBean getOneUser(BigInteger tel, String pass);
+
+
+    /**
+     * 更新一个用户
+     *
+     * @param userBean
+     */
+    void updateUser(@Param("userBean") UserBean userBean);
 
 }

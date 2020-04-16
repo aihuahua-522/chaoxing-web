@@ -7,6 +7,7 @@ import com.huahua.chaoxing.service.i.UserService;
 import com.huahua.chaoxing.util.EmailUtil;
 import com.huahua.chaoxing.util.JsonUtil;
 import com.huahua.chaoxing.util.MybatisUtil;
+import org.apache.ibatis.jdbc.SQL;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
 
@@ -154,6 +155,26 @@ public class UserServiceImpl implements UserService {
         UserBean userBean = mapper.selectByTel(tel, pass);
         sqlSession.close();
         return userBean;
+    }
+
+    /**
+     * 更新一个用户
+     *
+     * @param userBean 用户
+     */
+    @Override
+    public void updateUser(UserBean userBean) {
+        SqlSession sqlSession = MybatisUtil.getSqlSession();
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+        try {
+            mapper.update(userBean);
+        } catch (Exception e) {
+            e.printStackTrace();
+            sqlSession.rollback();
+        } finally {
+            sqlSession.commit();
+            sqlSession.close();
+        }
     }
 
 

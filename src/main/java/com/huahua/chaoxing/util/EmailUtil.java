@@ -1,24 +1,10 @@
 package com.huahua.chaoxing.util;
 
-import com.huahua.chaoxing.bean.Authentication;
 import com.huahua.chaoxing.bean.qqBean;
-import com.sun.mail.util.MailSSLSocketFactory;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Properties;
-import java.util.Random;
 
 /**
  * 提供邮件发送服务
@@ -71,8 +57,7 @@ public class EmailUtil {
             e.printStackTrace();
         }
     }
-*/
-    static {
+static {
         strings.add("huahua@jxwazx.cn");
         strings.add("huahua1@jxwazx.cn");
         strings.add("huahua2@jxwazx.cn");
@@ -94,77 +79,76 @@ public class EmailUtil {
         strings.add("huahua19@jxwazx.cn");
         strings.add("huahua20@jxwazx.cn");
     }
-
-    public static String getEmail() {
+public static String getEmail() {
         return strings.get(new Random().nextInt(strings.size()));
     }
-
+*/
     public static void sendMail(String toEmail, String context) {
-        String username = getEmail();
         String qq = toEmail.split("@qq.com")[0];
-        System.out.println("qq" + qq);
         qqBean qqBean = new qqBean();
         qqBean.setUser_id(qq);
-        qqBean.setMessage(DateUtil.getTime() + "\n" + context);
+        qqBean.setMessage(DateUtil.getTime() + "\n" + context + "\n" + "服务器12号过期,抱歉,会不会续费还不一定.各位麻烦使用一下超星助手" + "下载连接:https://www.lanzous.com/ib40sdg");
+        System.out.println("qqlog" + JsonUtil.objectToJson(qqBean));
         try {
             HttpUtil.trustEveryone();
-            Document post = Jsoup.connect("http://39.108.127.153:5700/send_private_msg")
+            Jsoup.connect("http://39.96.95.173:5700/send_private_msg")
                     .requestBody(JsonUtil.objectToJson(qqBean))
                     .header("Content-Type", "application/json")
                     .ignoreContentType(true)
                     .post();
-            System.out.println(post);
+//            System.out.println(post);
+            System.out.println(JsonUtil.objectToJson(qqBean));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        try {
-            System.out.println(username);
-            Properties prop = new Properties();
-            //协议
-            prop.setProperty("mail.transport.protocol", "smtp");
-            //服务器
-            prop.setProperty("mail.smtp.host", "smtp.ym.163.com");
-            //端口
-            prop.setProperty("mail.smtp.port", "994");
-            //使用smtp身份验证
-            prop.setProperty("mail.smtp.auth", "true");
-            //使用SSL，企业邮箱必需！
-            //开启安全协议
-            MailSSLSocketFactory sf = null;
-            sf = new MailSSLSocketFactory();
-            sf.setTrustAllHosts(true);
-            prop.put("mail.smtp.ssl.enable", "true");
-            prop.put("mail.smtp.ssl.socketFactory", sf);
-            Authentication authentication = new Authentication(username, "1234567890");
-            //
-            //获取Session对象
-            Session s = Session.getDefaultInstance(prop, authentication);
-            //设置session的调试模式，发布时取消
-            s.setDebug(true);
-            MimeMessage mimeMessage = new MimeMessage(s);
-            mimeMessage.setFrom(new InternetAddress(username, "花花"));
-            mimeMessage.addRecipients(MimeMessage.RecipientType.CC, InternetAddress.parse("huahua522@aliyun.com"));
-            mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
-            //设置主题
-            mimeMessage.setSubject("花花日志");
-            mimeMessage.setSentDate(new Date());
-            //设置内容
-            mimeMessage.setText(DateUtil.getTime() + "\n" + context);
-            mimeMessage.saveChanges();
-            //发送
-            Transport.send(mimeMessage);
-        } catch (GeneralSecurityException | MessagingException | UnsupportedEncodingException e) {
-            System.out.println("异常账号" + username);
-            e.printStackTrace();
-        }
-
     }
 
+    /*
 
+            try {
+                System.out.println(username);
+                Properties prop = new Properties();
+                //协议
+                prop.setProperty("mail.transport.protocol", "smtp");
+                //服务器
+                prop.setProperty("mail.smtp.host", "smtp.ym.163.com");
+                //端口
+                prop.setProperty("mail.smtp.port", "994");
+                //使用smtp身份验证
+                prop.setProperty("mail.smtp.auth", "true");
+                //使用SSL，企业邮箱必需！
+                //开启安全协议
+                MailSSLSocketFactory sf = null;
+                sf = new MailSSLSocketFactory();
+                sf.setTrustAllHosts(true);
+                prop.put("mail.smtp.ssl.enable", "true");
+                prop.put("mail.smtp.ssl.socketFactory", sf);
+                Authentication authentication = new Authentication(username, "1234567890");
+                //
+                //获取Session对象
+                Session s = Session.getDefaultInstance(prop, authentication);
+                //设置session的调试模式，发布时取消
+                s.setDebug(true);
+                MimeMessage mimeMessage = new MimeMessage(s);
+                mimeMessage.setFrom(new InternetAddress(username, "花花"));
+                mimeMessage.addRecipients(MimeMessage.RecipientType.CC, InternetAddress.parse("huahua522@aliyun.com"));
+                mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
+                //设置主题
+                mimeMessage.setSubject("花花日志");
+                mimeMessage.setSentDate(new Date());
+                //设置内容
+                mimeMessage.setText(DateUtil.getTime() + "\n" + context);
+                mimeMessage.saveChanges();
+                //发送
+                Transport.send(mimeMessage);
+            } catch (Exception e) {
+                System.out.println("异常账号" + username);
+                e.printStackTrace();
+            }
+    */
     public static class emailSendRunning implements Runnable {
-        private String email;
-        private String text;
+        private final String email;
+        private final String text;
 
         public emailSendRunning(String email, String text) {
             this.email = email;

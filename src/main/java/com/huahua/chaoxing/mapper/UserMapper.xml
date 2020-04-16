@@ -5,6 +5,7 @@
     <resultMap id="BaseResultMap" type="UserBean">
         <id column="u_tel" jdbcType="INTEGER" property="tel"/>
         <result column="u_pass" jdbcType="VARCHAR" property="pass"/>
+        <result column="u_name" jdbcType="VARCHAR" property="name"/>
         <result column="u_signPlace" jdbcType="VARCHAR" property="signPlace"/>
         <result column="u_email" jdbcType="VARCHAR" property="email"/>
         <result column="u_cookies" jdbcType="VARCHAR" property="cookies"/>
@@ -29,6 +30,7 @@
     <sql id="all">
         u.tel  as   u_tel,
         u.pass as   u_pass,
+        u.name as   u_name,
         u.signPlace as u_signPlace,
         u.email as u_email,
         u.cookies as u_cookies,
@@ -46,8 +48,12 @@
         c.teacher as c_teacher
     </sql>
     <insert id="insert" parameterType="userBean">
-            insert into userinfo values(#{userBean.tel},#{userBean.pass},#{userBean.signPlace},#{userBean.email},#{userBean.cookies});
+            insert into userinfo values(#{userBean.tel},#{userBean.pass},#{userBean.signPlace},#{userBean.email},#{userBean.cookies},null);
     </insert>
+
+    <update id="update" parameterType="UserBean">
+        update userInfo  set cookies = #{userBean.cookies} ,name = #{userBean.name} where tel = #{userBean.tel} and pass = #{userBean.pass} ;
+    </update>
 
     <select id="checkUser" resultType="int">
         select
@@ -60,7 +66,7 @@
     </select>
 
     <delete id="delete">
-        delete  from userInfo u where u.tel = #{tel} and u.pass  = #{pass}
+        delete  from userInfo u where u.tel = #{tel} and u.pass  = #{pass};
     </delete>
 
 

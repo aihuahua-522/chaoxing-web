@@ -13,17 +13,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigInteger;
 
-@WebServlet(name = "GetInfoServlet",value = "/GetInfoServlet")
+@WebServlet(name = "GetInfoServlet", value = "/GetInfoServlet")
 public class GetInfoServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
         doGet(request, response);
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         BigInteger tel = BigInteger.valueOf(Long.parseLong(request.getParameter("tel")));
+
         UserService service = new UserServiceImpl();
         UserBean pass = service.getOneUser(tel, request.getParameter("pass"));
         response.getWriter().println(JsonUtil.objectToJson(pass));

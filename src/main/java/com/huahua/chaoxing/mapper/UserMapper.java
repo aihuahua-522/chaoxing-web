@@ -48,4 +48,9 @@ public interface UserMapper {
     int checkUser(@Param("tel") BigInteger tel, @Param("pass") String pass);
 
 
+    /**
+     * 更新用户
+     * @param userBean
+     */
+    void update(@Param("userBean") UserBean userBean);
 }

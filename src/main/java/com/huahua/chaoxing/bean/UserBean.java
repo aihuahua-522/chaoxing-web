@@ -8,8 +8,26 @@ import java.util.ArrayList;
  */
 
 public class UserBean {
+    public UserBean() {
+    }
+
     private BigInteger tel;
     private String pass;
+    private String name;
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public UserBean(BigInteger tel, String pass) {
+        this.tel = tel;
+        this.pass = pass;
+    }
+
     private String signPlace;
     private String email;
     private String cookies;

@@ -17,7 +17,7 @@
         <setting name="autoMappingBehavior" value="PARTIAL"/>
         <setting name="autoMappingUnknownColumnBehavior" value="WARNING"/>
         <setting name="defaultExecutorType" value="SIMPLE"/>
-        <setting name="defaultStatementTimeout" value="25"/>
+        <setting name="defaultStatementTimeout" value="300"/>
         <setting name="defaultFetchSize" value="100"/>
         <setting name="safeRowBoundsEnabled" value="false"/>
         <setting name="mapUnderscoreToCamelCase" value="false"/>
@@ -38,9 +38,9 @@
     <environments default="development">
         <environment id="development">
             <transactionManager type="JDBC"/>
-            <dataSource type="POOLED">
-                <property name="driver" value="${driver}"/>
-                <property name="url" value="${url}"/>
+            <dataSource type="com.huahua.chaoxing.bean.DruidDataSourceFactory">
+                <property name="driverClass" value="${driver}"/>
+                <property name="jdbcUrl" value="${url}"/>
                 <property name="username" value="${username}"/>
                 <property name="password" value="${password}"/>
             </dataSource>
