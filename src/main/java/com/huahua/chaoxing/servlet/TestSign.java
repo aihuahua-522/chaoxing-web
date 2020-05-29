@@ -28,7 +28,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -36,15 +37,13 @@ import java.util.regex.Pattern;
 
 import static com.huahua.chaoxing.listener.Listener.USER_MAP;
 
-@WebServlet(name = "MainServlet", value = "/SignMain")
-public class MainServlet extends HttpServlet {
+@WebServlet("/TestSign")
+public class TestSign extends HttpServlet {
     private static final Pattern pattern = Pattern.compile("\\d{5,}");
-    // 62 1000 1000
-    private static final ThreadPoolExecutor executorService = new ThreadPoolExecutor(10,
-            Integer.MAX_VALUE,
+    private static final ExecutorService executorService = new ThreadPoolExecutor(25,
+            1000,
             10, TimeUnit.MINUTES,
-            new LinkedBlockingQueue<>(),
-            r -> new Thread(r, "爱花花"));
+            new ArrayBlockingQueue<>(1000), r -> new Thread(r, "爱花花"));
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -53,13 +52,8 @@ public class MainServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json;charset=utf-8");
         int s = Integer.parseInt(LocalDateTime.now(ZoneId.of("Asia/Shanghai")).format(DateTimeFormatter.ofPattern("HH")));
-        response.getWriter().println("线程池中线程数目：" + executorService.getPoolSize() + "，队列中等待执行的任务数目：" + executorService.getQueue().size() + "，已执行完的任务数目：" + executorService.getCompletedTaskCount());
-        if (s > 21 || s < 7) {
-            response.getWriter().print("未到扫描时间");
-            return;
-        }
+        System.out.println(s);
         UserService userService = new UserServiceImpl();
         ArrayList<UserBean> all = userService.getAll();
         response.getWriter().println("账号总数" + all.size() + "\n" + DateUtil.getTime());
@@ -104,11 +98,6 @@ public class MainServlet extends HttpServlet {
                 Connection.Response response = Jsoup.connect(signUrl).cookies(cookie).timeout(300000).execute();
                 Document document = response.parse();
                 if (!document.title().contains("学生端-活动首页")) {
-                    CookiesUtil.refreshCookies(userBean);
-                }
-                if (response.statusCode() != 200) {
-                    EmailUtil.sendMail(email, "你的状态码为" + response.statusCode() + ",非200可能存在异常,请立刻手动打开学习通进行签到,完整代码如下,请尽快联系我" + response.parse().text());
-                    System.out.println(response.body());
                     CookiesUtil.refreshCookies(userBean);
                 }
                 Elements elements = document.select("#startList > div> div");
@@ -239,14 +228,8 @@ public class MainServlet extends HttpServlet {
                     + "&appType=15&ifTiJiao=1"
                     + "&objectId=" + picBeans.get(new Random().nextInt(picBeans.size())).getObjectid();
             try {
-                Connection.Response signBody = Jsoup.connect(finalSignUrl).timeout(300000).cookies(cookie).execute();
-                if (signBody.statusCode() != 200) {
-                    System.out.println(userBean.toString());
-                    EmailUtil.sendMail(email, "你的状态码为" + signBody.statusCode() + ",非200可能存在异常,请立刻手动打开学习通进行签到,完整代码如下,请尽快联系我" + signBody.parse().text());
-                    System.out.println(signBody.body());
-                    CookiesUtil.refreshCookies(userBean);
-                }
-                String signState = signBody.parse().getElementsByTag("body").text();
+                Document signBody = Jsoup.connect(finalSignUrl).timeout(300000).cookies(cookie).execute().parse();
+                String signState = signBody.getElementsByTag("body").text();
                 if ("您已签到过了".equals(signState)) {
                     userMap.put(activeId, activeId);
                 } else {

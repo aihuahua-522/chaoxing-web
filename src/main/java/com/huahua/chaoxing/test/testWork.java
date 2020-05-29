@@ -16,7 +16,6 @@ import java.util.HashMap;
 public class testWork {
 
     public static void main(String[] args) throws Exception {
-
         UserServiceImpl userService = new UserServiceImpl();
         UserBean oneUser = userService.getOneUser(BigInteger.valueOf(Long.parseLong("17707962579")), "1234567890");
         for (CourseBean courseBean : oneUser.getCourseBeans()) {

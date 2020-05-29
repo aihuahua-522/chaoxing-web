@@ -8,31 +8,39 @@ import java.util.ArrayList;
  */
 
 public class UserBean {
-    public UserBean() {
-    }
-
     private BigInteger tel;
     private String pass;
     private String name;
+    private String signPlace;
+    private String email;
+    private String cookies;
+    private ArrayList<PicBean> picBeans;
+    private ArrayList<CourseBean> courseBeans;
 
-    public void setName(String name) {
-        this.name = name;
+    public UserBean() {
+    }
+    public UserBean(BigInteger tel, String pass) {
+        this.tel = tel;
+        this.pass = pass;
+    }
+
+    @Override
+    public String toString() {
+        return "UserBean{" +
+                "tel=" + tel +
+                ", pass='" + pass + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 
     public String getName() {
         return name;
     }
 
-    public UserBean(BigInteger tel, String pass) {
-        this.tel = tel;
-        this.pass = pass;
+    public void setName(String name) {
+        this.name = name;
     }
-
-    private String signPlace;
-    private String email;
-    private String cookies;
-    private ArrayList<PicBean> picBeans;
-    private ArrayList<CourseBean> courseBeans;
 
     public ArrayList<CourseBean> getCourseBeans() {
         return courseBeans;

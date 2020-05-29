@@ -9,14 +9,12 @@ import com.huahua.chaoxing.service.i.PicService;
 import com.huahua.chaoxing.service.i.UserService;
 import com.huahua.chaoxing.util.MybatisUtil;
 import org.apache.ibatis.session.SqlSession;
-import org.apache.log4j.Logger;
 
 import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
 public class PicServiceImpl implements PicService {
-    private static Logger logger = Logger.getLogger(PicServiceImpl.class);
     private UserService userService = new UserServiceImpl();
 
     /**
@@ -49,7 +47,6 @@ public class PicServiceImpl implements PicService {
                 resultBean.setData("");
             }
         } catch (Exception e) {
-            logger.error(e);
             sqlSession.rollback();
             resultBean.setCode(201);
             resultBean.setMsg("上传失败");
@@ -100,7 +97,6 @@ public class PicServiceImpl implements PicService {
                 resultBean.setData("");
             }
         } catch (Exception e) {
-            logger.error(e);
             sqlSession.rollback();
             resultBean.setCode(201);
             resultBean.setMsg("图片删除失败");

@@ -9,7 +9,6 @@ import com.huahua.chaoxing.service.i.CourseService;
 import com.huahua.chaoxing.service.i.UserService;
 import com.huahua.chaoxing.util.MybatisUtil;
 import org.apache.ibatis.session.SqlSession;
-import org.apache.log4j.Logger;
 
 import java.lang.reflect.Type;
 import java.math.BigInteger;
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 
 public class CourseServiceImpl implements CourseService {
     private static final UserService userService = new UserServiceImpl();
-    private static Logger logger = Logger.getLogger(CourseServiceImpl.class);
 
     /**
      * 添加课程
@@ -52,7 +50,6 @@ public class CourseServiceImpl implements CourseService {
             resultBean.setMsg("账号或密码错误");
             return resultBean;
         } catch (Exception e) {
-            logger.error(e);
             e.printStackTrace();
             sqlSession.rollback();
             resultBean.setCode(202);
@@ -91,7 +88,6 @@ public class CourseServiceImpl implements CourseService {
             resultBean.setMsg("账号或密码错误");
             return resultBean;
         } catch (Exception e) {
-            logger.error(e);
             e.printStackTrace();
             sqlSession.rollback();
             resultBean.setCode(200);

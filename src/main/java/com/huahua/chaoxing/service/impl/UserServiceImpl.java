@@ -7,9 +7,7 @@ import com.huahua.chaoxing.service.i.UserService;
 import com.huahua.chaoxing.util.EmailUtil;
 import com.huahua.chaoxing.util.JsonUtil;
 import com.huahua.chaoxing.util.MybatisUtil;
-import org.apache.ibatis.jdbc.SQL;
 import org.apache.ibatis.session.SqlSession;
-import org.apache.log4j.Logger;
 
 import javax.servlet.http.Cookie;
 import java.math.BigInteger;
@@ -17,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class UserServiceImpl implements UserService {
-    private static Logger logger = Logger.getLogger(UserServiceImpl.class);
 
     private HashMap<String, String> getHashMapByArray(Cookie[] cookies) {
 
@@ -61,7 +58,6 @@ public class UserServiceImpl implements UserService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error(e);
             sqlSession.rollback();
             resultBean.setCode(202);
             resultBean.setMsg("添加失败,请尝试更换邮箱或者手机号");
@@ -101,7 +97,6 @@ public class UserServiceImpl implements UserService {
             resultBean.setData("");
             resultBean.setMsg("删除失败");
             sqlSession.rollback();
-            logger.error(e);
             e.printStackTrace();
         } finally {
             sqlSession.commit();
@@ -117,11 +112,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public ArrayList<UserBean> getAll() {
-        SqlSession sqlSession = MybatisUtil.getSqlSession();
-        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
-        ArrayList<UserBean> all = mapper.getAll();
-        sqlSession.close();
-        return all;
+        try (SqlSession sqlSession = MybatisUtil.getSqlSession()) {
+            UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+            return mapper.getAll();
+        }
     }
 
     /**
@@ -133,11 +127,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public boolean checkUser(BigInteger tel, String pass) {
-        SqlSession sqlSession = MybatisUtil.getSqlSession();
-        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
-        boolean b = mapper.checkUser(tel, pass) != 0;
-        sqlSession.close();
-        return b;
+        try (SqlSession sqlSession = MybatisUtil.getSqlSession()) {
+            UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+            return mapper.checkUser(tel, pass) != 0;
+        }
     }
 
 

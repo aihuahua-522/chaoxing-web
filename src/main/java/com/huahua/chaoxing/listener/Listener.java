@@ -14,8 +14,6 @@ import java.util.HashMap;
 public class Listener implements ServletContextListener,
         HttpSessionListener, HttpSessionAttributeListener {
     public static HashMap<String, HashMap<String, String>> USER_MAP = new HashMap<>();
-
-
     // Public constructor is required by servlet spec
     public Listener() {
 

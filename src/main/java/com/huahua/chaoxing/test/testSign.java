@@ -1,4 +1,5 @@
-package com.huahua.chaoxing.servlet;
+package com.huahua.chaoxing.test;
+
 
 import com.huahua.chaoxing.bean.CourseBean;
 import com.huahua.chaoxing.bean.PicBean;
@@ -6,7 +7,6 @@ import com.huahua.chaoxing.bean.UserBean;
 import com.huahua.chaoxing.service.i.UserService;
 import com.huahua.chaoxing.service.impl.UserServiceImpl;
 import com.huahua.chaoxing.util.CookiesUtil;
-import com.huahua.chaoxing.util.DateUtil;
 import com.huahua.chaoxing.util.EmailUtil;
 import com.huahua.chaoxing.util.JsonUtil;
 import org.jsoup.Connection;
@@ -15,20 +15,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.net.URLEncoder;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -36,34 +28,27 @@ import java.util.regex.Pattern;
 
 import static com.huahua.chaoxing.listener.Listener.USER_MAP;
 
-@WebServlet(name = "MainServlet", value = "/SignMain")
-public class MainServlet extends HttpServlet {
+public class testSign {
     private static final Pattern pattern = Pattern.compile("\\d{5,}");
-    // 62 1000 1000
-    private static final ThreadPoolExecutor executorService = new ThreadPoolExecutor(10,
+    private static final ThreadPoolExecutor executorService = new ThreadPoolExecutor(50,
             Integer.MAX_VALUE,
             10, TimeUnit.MINUTES,
             new LinkedBlockingQueue<>(),
             r -> new Thread(r, "爱花花"));
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-    }
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json;charset=utf-8");
-        int s = Integer.parseInt(LocalDateTime.now(ZoneId.of("Asia/Shanghai")).format(DateTimeFormatter.ofPattern("HH")));
-        response.getWriter().println("线程池中线程数目：" + executorService.getPoolSize() + "，队列中等待执行的任务数目：" + executorService.getQueue().size() + "，已执行完的任务数目：" + executorService.getCompletedTaskCount());
-        if (s > 21 || s < 7) {
-            response.getWriter().print("未到扫描时间");
-            return;
-        }
+    public static void main(String[] args) {
         UserService userService = new UserServiceImpl();
         ArrayList<UserBean> all = userService.getAll();
-        response.getWriter().println("账号总数" + all.size() + "\n" + DateUtil.getTime());
         all.forEach((u) -> executorService.execute(new signRunning(u)));
+        ScheduledThreadPoolExecutor service = new ScheduledThreadPoolExecutor(1);
+        service.schedule(new testRunning(), 30, TimeUnit.SECONDS);
+    }
+
+    static class testRunning implements Runnable {
+        @Override
+        public void run() {
+            System.out.println("线程池中线程数目：" + executorService.getPoolSize() + "，队列中等待执行的任务数目：" + executorService.getQueue().size() + "，已执行完的任务数目：" + executorService.getCompletedTaskCount());
+        }
     }
 
 
@@ -71,12 +56,12 @@ public class MainServlet extends HttpServlet {
 
         private final HashMap<String, String> userMap;
         private final UserBean userBean;
+        int i = 0;
 
         public signRunning(UserBean userbean) {
             this.userBean = userbean;
-            String tel = String.valueOf(userBean.getTel());
-            userMap = USER_MAP.get(tel) != null ? USER_MAP.get(tel) : new HashMap<>();
-            USER_MAP.put(tel, userMap);
+            userMap = USER_MAP.get(String.valueOf(userBean.getTel())) != null ? USER_MAP.get(String.valueOf(userBean.getTel())) : new HashMap<>();
+            USER_MAP.put(String.valueOf(userBean.getTel()), userMap);
         }
 
         @Override
@@ -100,16 +85,13 @@ public class MainServlet extends HttpServlet {
 
         private void beginExecution(String email, HashMap<String, String> cookie, ArrayList<CourseBean> courseBeans, String name, ArrayList<PicBean> picBeans, String signPlace) throws Exception {
             for (CourseBean courseBean : courseBeans) {
+                System.out.println((++i) + "\t" + courseBean.getCourseName());
                 String signUrl = courseBean.getSignUrl();
                 Connection.Response response = Jsoup.connect(signUrl).cookies(cookie).timeout(300000).execute();
                 Document document = response.parse();
                 if (!document.title().contains("学生端-活动首页")) {
                     CookiesUtil.refreshCookies(userBean);
-                }
-                if (response.statusCode() != 200) {
-                    EmailUtil.sendMail(email, "你的状态码为" + response.statusCode() + ",非200可能存在异常,请立刻手动打开学习通进行签到,完整代码如下,请尽快联系我" + response.parse().text());
-                    System.out.println(response.body());
-                    CookiesUtil.refreshCookies(userBean);
+                    System.out.println("标题" + document.title());
                 }
                 Elements elements = document.select("#startList > div> div");
                 judgeType(email, cookie, name, picBeans, courseBean, elements, signPlace);
@@ -239,14 +221,8 @@ public class MainServlet extends HttpServlet {
                     + "&appType=15&ifTiJiao=1"
                     + "&objectId=" + picBeans.get(new Random().nextInt(picBeans.size())).getObjectid();
             try {
-                Connection.Response signBody = Jsoup.connect(finalSignUrl).timeout(300000).cookies(cookie).execute();
-                if (signBody.statusCode() != 200) {
-                    System.out.println(userBean.toString());
-                    EmailUtil.sendMail(email, "你的状态码为" + signBody.statusCode() + ",非200可能存在异常,请立刻手动打开学习通进行签到,完整代码如下,请尽快联系我" + signBody.parse().text());
-                    System.out.println(signBody.body());
-                    CookiesUtil.refreshCookies(userBean);
-                }
-                String signState = signBody.parse().getElementsByTag("body").text();
+                Document signBody = Jsoup.connect(finalSignUrl).timeout(300000).cookies(cookie).execute().parse();
+                String signState = signBody.getElementsByTag("body").text();
                 if ("您已签到过了".equals(signState)) {
                     userMap.put(activeId, activeId);
                 } else {
@@ -270,7 +246,9 @@ public class MainServlet extends HttpServlet {
         private void getUserName(HashMap<String, String> cookies) throws Exception {
             String getName = "http://i.chaoxing.com/base";
             Document document = Jsoup.connect(getName).cookies(cookies).timeout(300000).get();
+            System.out.println(document);
             String name = document.select(".user-name").text();
+            System.out.println("name" + name);
             UserServiceImpl service = new UserServiceImpl();
             userBean.setName(name);
             service.updateUser(userBean);

@@ -34,8 +34,8 @@ public class CookiesUtil {
         @Override
         public void run() {
             try {
-                String loginUrl = "http://i.chaoxing.com/vlogin?passWord=" + userBean.getPass() + "&userName=" + userBean.getTel();
-                Connection.Response response = Jsoup.connect(loginUrl).method(Connection.Method.GET).timeout(5000).execute();
+                String loginUrl = "https://passport2-api.chaoxing.com/v11/loginregister?uname=" + userBean.getTel() + "&code=" + userBean.getPass() + "&loginType=1&roleSelect=true";
+                Connection.Response response = Jsoup.connect(loginUrl).method(Connection.Method.POST).timeout(5000).execute();
                 String s = response.parse().body().toString();
                 if (s.contains("true")) {
                     HashMap<String, String> cookies = (HashMap<String, String>) response.cookies();
@@ -51,7 +51,7 @@ public class CookiesUtil {
             } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println(userBean.getTel() + "密码" + userBean.getPass() + "错误" + e.getLocalizedMessage());
-                EmailUtil.sendMail(userBean.getEmail(),userBean.getTel()+":服务器为你更新cookie");
+                EmailUtil.sendMail(userBean.getEmail(), userBean.getTel() + ":服务器为你更新cookie");
             }
         }
     }

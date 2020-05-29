@@ -9,7 +9,6 @@
 
     <settings>
         <setting name="cacheEnabled" value="true"/>
-        <setting name="logImpl" value="LOG4J"/>
         <setting name="lazyLoadingEnabled" value="true"/>
         <setting name="multipleResultSetsEnabled" value="true"/>
         <setting name="useColumnLabel" value="true"/>
