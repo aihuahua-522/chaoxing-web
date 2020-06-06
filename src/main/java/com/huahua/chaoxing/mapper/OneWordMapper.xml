@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huahua.chaoxing.mapper.OneWordMapper">
+
+
+    <insert id="save" parameterType="string">
+
+        insert into oneword values (#{word});
+
+    </insert>
+    <select id="getWord" resultType="java.lang.String" parameterType="int">
+        select * from oneword  order by rand() limit #{size};
+    </select>
+</mapper>

@@ -29,5 +29,5 @@ public interface CourseMapper {
     ArrayList<CourseBean> getAllCourse(@Param("tel") BigInteger tel);
 
 
-
+    int deleteOneCoure(@Param("tel") BigInteger tel, @Param("courseId") String courseId, @Param("classId") String classId);
 }

@@ -3,14 +3,27 @@
 <mapper namespace="com.huahua.chaoxing.mapper.CourseMapper">
 
     <insert id="insertCourse" parameterType="courseBean">
-        insert into course values (default ,#{tel},#{course.classId},#{course.courseId},#{course.teacher},#{course.courseName},#{course.className},#{course.signUrl},#{course.workUrl});
+        insert into course
+        values (default, #{tel}, #{course.classId}, #{course.courseId}, #{course.teacher}, #{course.courseName},
+                #{course.className}, #{course.signUrl}, #{course.workUrl});
     </insert>
 
     <delete id="deleteAllCourse">
-        delete from course where tel = #{tel};
+        delete
+        from course
+        where tel = #{tel};
+    </delete>
+    <delete id="deleteOneCoure">
+        delete
+        from course
+        where tel = #{tel}
+          and classId = #{classId}
+          and courseId = #{courseId};
     </delete>
     <select id="getAllCourse" resultType="com.huahua.chaoxing.bean.CourseBean">
-        select * from course where tel = #{tel};
+        select *
+        from course
+        where tel = #{tel};
     </select>
 
 </mapper>
